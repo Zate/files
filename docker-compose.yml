@@ -1,7 +1,7 @@
 version: "3"
 
 networks:
-  proxy:
+  traefik-public:
     external: true
   internal:
     external: false
@@ -10,16 +10,27 @@ services:
   files:
     image: zate75/files
     container_name: files
-    restart: always
+    restart: on-failure
     entrypoint: ["./files","-d","./stuff"]
     labels:
       - traefik.backend=files
       - traefik.frontend.rule=Host:files.zate.org
-      - traefik.docker.network=proxy
-#      - traefik.port=80
+      - traefik.docker.network=traefik-public
+      - traefik.enable=true
+      - traefik.port=8100
+      - traefik.tags=traefik-public
+      # Traefik service that listens to HTTP
+      - traefik.redirectorservice.frontend.entryPoints=http
+      - traefik.redirectorservice.frontend.redirect.entryPoint=https
+      # Traefik service that listens to HTTPS
+      - traefik.webservice.frontend.entryPoints=https
     networks:
       - internal
-      - proxy
+      - traefik-public
     volumes:
-      - ./stuff:/home/files/stuff:cached
+      - /root/docker/stuff:/stuff:cached
+    deploy:
+      placement:
+        constraints:
+          - node.role == manager
 #
