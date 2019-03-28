@@ -12,18 +12,7 @@ services:
     container_name: files
     restart: on-failure
     entrypoint: ["./files","-d","./stuff"]
-    labels:
-      - traefik.backend=files
-      - traefik.frontend.rule=Host:files.zate.org
-      - traefik.docker.network=traefik-public
-      - traefik.enable=true
-      - traefik.port=8100
-      - traefik.tags=traefik-public
-      # Traefik service that listens to HTTP
-      - traefik.redirectorservice.frontend.entryPoints=http
-      - traefik.redirectorservice.frontend.redirect.entryPoint=https
-      # Traefik service that listens to HTTPS
-      - traefik.webservice.frontend.entryPoints=https
+
     networks:
       - internal
       - traefik-public
@@ -33,4 +22,16 @@ services:
       placement:
         constraints:
           - node.role == manager
+      labels:
+        - traefik.backend=files
+        - traefik.frontend.rule=Host:files.zate.org
+        - traefik.docker.network=traefik-public
+        - traefik.enable=true
+        - traefik.port=8100
+        - traefik.tags=traefik-public
+        # Traefik service that listens to HTTP
+        - traefik.redirectorservice.frontend.entryPoints=http
+        - traefik.redirectorservice.frontend.redirect.entryPoint=https
+        # Traefik service that listens to HTTPS
+        - traefik.webservice.frontend.entryPoints=https
 #
